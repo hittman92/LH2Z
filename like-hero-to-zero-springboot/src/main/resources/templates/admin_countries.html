@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"><title>Admin – Länder</title></head>
+<body>
+<h1>Länder verwalten</h1>
+
+<p th:if="${message}" style="color:green;" th:text="${message}"></p>
+<p th:if="${error}"   style="color:red;"   th:text="${error}"></p>
+
+<form th:action="@{/admin/countries}" method="post">
+  <input type="hidden"
+       th:if="${_csrf != null}"
+       th:name="${_csrf.parameterName}"
+       th:value="${_csrf.token}" />
+  <label>ISO3:
+    <input name="iso3" placeholder="z. B. AUT" maxlength="3" required/>
+  </label><br/>
+  <label>Name:
+    <input name="name" placeholder="Austria" required/>
+  </label><br/>
+  <label>Region:
+    <input name="region" placeholder="Europe"/>
+  </label><br/>
+  <button type="submit">Land anlegen</button>
+</form>
+
+<h2>Vorhandene Länder</h2>
+<ul>
+  <li th:each="c : ${countries}"
+      th:text="${c.id + ' — ' + c.name + (c.region!=null ? ' ('+c.region+')' : '')}">
+    DEU — Germany (Europe)
+  </li>
+</ul>
+
+<p><a href="/admin/emissions">Zu Emissionen</a> · <a href="/">Zur Startseite</a></p>
+</body>
+</html>

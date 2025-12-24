@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin – Emissionen</title>
+
+  <!-- jQuery + DataTables -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/jquery.dataTables.min.css"/>
+
+  <style>
+    body { font-family: system-ui, Arial, sans-serif; margin: 20px; }
+    form .row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 8px; }
+    label { display: flex; flex-direction: column; font-size: 12px; }
+    input, select, button { padding: 6px; }
+    .actions { margin-top: 8px; }
+  </style>
+</head>
+<body>
+<h1>Emissionen verwalten</h1>
+
+<p th:if="${message}" style="color:green" th:text="${message}"></p>
+<p th:if="${error}"   style="color:red"   th:text="${error}"></p>
+
+<form th:object="${form}" method="post" th:action="@{/admin/emissions}">
+  <input type="hidden"
+         th:if="${_csrf != null}"
+         th:name="${_csrf.parameterName}"
+         th:value="${_csrf.token}" />
+  <div class="row">
+    <label for="countryIso3">Land (ISO3)</label>
+    <select id="countryIso3" th:field="*{countryIso3}">
+      <option value="">— bitte wählen —</option>
+      <option th:each="c : ${countries}"
+              th:value="${c.id}"
+              th:text="${c.id} + ' — ' + ${c.name}">
+      </option>
+    </select>
+    <label>Jahr
+      <input th:field="*{year}" type="number" min="1900" max="2100" required/>
+    </label>
+    <label>CO₂ (kt)
+      <input th:field="*{valueKt}" type="text" placeholder="z.B. 123456,78" required/>
+    </label>
+    <label>Quelle
+      <input th:field="*{source}" type="text" required/>
+    </label>
+    <label>Unternehmen
+      <input th:field="*{company}" type="text" placeholder="optional"/>
+    </label>
+  </div>
+  <div class="actions">
+    <button type="submit">Speichern (PENDING)</button>
+    &nbsp;|&nbsp;
+    <a href="/">Zur Startseite</a>
+    &nbsp;·&nbsp;
+    <a href="/admin/review" title="Zur Freigabe (nur Publisher)">Zur Freigabe</a>
+  </div>
+</form>
+<hr/>
+<h2>Vorhandene Einträge</h2>
+<table id="emissionsTable" class="display" style="width:100%">
+  <thead>
+  <tr>
+    <th>ID</th>
+    <th>Land</th>
+    <th>ISO3</th>
+    <th>Jahr</th>
+    <th>CO₂ (kt)</th>
+    <th>Quelle</th>
+    <th>Unternehmen</th>
+    <th>Status</th>
+    <th>Aktion</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr th:each="r : ${records}">
+    <td th:text="${r.id}">1</td>
+    <td th:text="${r.country.name}">Germany</td>
+    <td th:text="${r.country.id}">DEU</td>
+    <td th:text="${r.year}">2024</td>
+    <td th:text="${r.valueKt}">0</td>
+    <td th:text="${r.source}">WorldBank</td>
+    <td th:text="${r.company}">—</td>
+    <td th:text="${r.status}">PENDING</td>
+    <td><a th:href="@{'/admin/emissions/edit/' + ${r.id}}">Bearbeiten</a></td>
+  </tr>
+  </tbody>
+</table>
+
+<!-- Thymeleaf Filtefunktion -->
+<script th:inline="none">
+  $(function () {
+    $('#emissionsTable').DataTable({
+      pageLength: 25,
+      order: [ [3, 'desc'] ],
+      columnDefs: [
+        { targets: 0, width: 50 },
+        { targets: 8, orderable: false, searchable: false }
+      ],
+      language: {
+        url: 'https://cdn.datatables.net/plug-ins/1.13.8/i18n/de-DE.json'
+      }
+    });
+  });
+</script>
+</body>
+</html>

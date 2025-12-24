@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Fehler</title>
+  <style> body{font-family:system-ui,Arial;margin:20px;} </style>
+</head>
+<body>
+<h1>Ups, da ist etwas schiefgelaufen.</h1>
+<p th:text="${message} ?: 'Bitte versuchen Sie es später erneut.'">Fehler</p>
+<p><a href="/">Zur Startseite</a></p>
+</body>
+</html>
+
+
+

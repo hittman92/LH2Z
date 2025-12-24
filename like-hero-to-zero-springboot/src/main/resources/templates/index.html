@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Like Hero To Zero – CO₂-Daten (Public)</title>
+
+  <!-- jQuery + DataTables -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/jquery.dataTables.min.css"/>
+
+  <style>
+    body { font-family: system-ui, Arial, sans-serif; margin: 20px; }
+    .toolbar { display:flex; gap:1rem; align-items:center; margin: 0 0 1rem; flex-wrap: wrap; }
+    .right { margin-left: auto; }
+    table.dataTable thead th { white-space: nowrap; }
+    .filters input { width: 100%; box-sizing: border-box; }
+  </style>
+</head>
+<body>
+
+<h1>Like Hero To Zero – Öffentliche CO₂-Daten</h1>
+<div class="notice" style="margin:12px 0;padding:10px;border:1px solid #ddd;border-radius:8px;">
+  <strong>Ihr Land:</strong>
+  <span th:text="${visitorCountryName}">—</span>
+  (<span th:text="${visitorIso3}">—</span>)
+  – freigegebene Summe:
+  <strong><span th:text="${#numbers.formatDecimal(visitorTotalKt, 0, 'COMMA', 0, 'POINT')}">0</span> kt</strong>
+</div>
+
+
+<div class="toolbar">
+  <form th:action="@{/}" method="get">
+    <label>Land (ISO3):
+      <input name="iso3" th:value="${selectedIso3}" placeholder="z. B. DEU" />
+    </label>
+    <button type="submit">Filtern</button>
+    <a th:href="@{/}" style="margin-left:.5rem">Zurücksetzen</a>
+  </form>
+  <div class="right">
+    <a th:href="@{/admin/emissions}">Admin: Emissionen</a>
+    &nbsp;·&nbsp;<a th:href="@{/admin/countries}">Admin: Länder</a>
+    &nbsp;·&nbsp;<a th:href="@{/admin/review}">Zur Freigabe</a>
+  </div>
+</div>
+
+<section th:if="${totalKt != null}">
+  <p><strong>Gesamter freigegebener CO₂-Ausstoß (kt) für
+    <span th:text="${selectedIso3}">—</span>:</strong>
+    <span th:text="${#numbers.formatDecimal(totalKt, 0, 'COMMA', 0, 'POINT')}">0</span>
+  </p>
+</section>
+
+<table id="publicTable" class="display" style="width:100%">
+  <thead>
+  <tr>
+    <th>Land</th>
+    <th>ISO3</th>
+    <th>Jahr</th>
+    <th>CO₂ (kt)</th>
+    <th>Quelle</th>
+    <th>Unternehmen</th>
+  </tr>
+  <!-- Spaltenfilter -->
+  <tr class="filters">
+    <th><input type="text" placeholder="Land"/></th>
+    <th><input type="text" placeholder="ISO3"/></th>
+    <th><input type="text" placeholder="Jahr"/></th>
+    <th><input type="text" placeholder="CO₂"/></th>
+    <th><input type="text" placeholder="Quelle"/></th>
+    <th><input type="text" placeholder="Unternehmen"/></th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr th:each="r : ${records}">
+    <td th:text="${r.country.name}">Germany</td>
+    <td th:text="${r.country.id}">DEU</td>
+    <td th:text="${r.year}">2024</td>
+    <td th:text="${#numbers.formatDecimal(r.valueKt, 0, 'COMMA', 0, 'POINT')}">0</td>
+    <td th:text="${r.source}">WorldBank</td>
+    <td th:text="${r.company}">–</td>
+  </tr>
+  </tbody>
+</table>
+
+<!-- Filterfunktion -->
+<script th:inline="none">
+  $(function () {
+    const table = $('#publicTable').DataTable({
+      pageLength: 25,
+      order: [[2, 'desc']],
+      language: { url: 'https://cdn.datatables.net/plug-ins/1.13.8/i18n/de-DE.json' }
+    });
+
+    $('#publicTable thead tr.filters th').each(function (i) {
+      $('input', this).on('keyup change', function () {
+        if (table.column(i).search() !== this.value) {
+          table.column(i).search(this.value).draw();
+        }
+      });
+    });
+  });
+</script>
+
+</body>
+</html>

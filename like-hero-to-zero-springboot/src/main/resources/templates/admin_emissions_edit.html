@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Emissionseintrag bearbeiten</title>
+  <style>
+    body { font-family: system-ui, Arial, sans-serif; margin: 20px; }
+    label { display:flex; flex-direction: column; max-width: 320px; margin-bottom: 10px; }
+    input, button { padding: 6px; }
+  </style>
+</head>
+<body>
+<h1>Emissionseintrag bearbeiten</h1>
+<form th:action="@{/admin/emissions/update}" method="post">
+  <input type="hidden"
+       th:if="${_csrf != null}"
+       th:name="${_csrf.parameterName}"
+       th:value="${_csrf.token}" />
+  <input type="hidden" name="id" th:value="${record.id}"/>
+  <p><strong>Land:</strong> <span th:text="${record.country.name}"></span> (<span th:text="${record.country.id}"></span>)</p>
+  <p><strong>Jahr:</strong> <span th:text="${record.year}"></span></p>
+  <label>CO₂ (kt)
+    <input name="valueKt" type="text" th:value="${record.valueKt}" required/>
+  </label>
+  <label>Quelle
+    <input name="source" type="text" th:value="${record.source}" required/>
+  </label>
+  <label>Unternehmen
+    <input name="company" type="text" th:value="${record.company}"/>
+  </label>
+  <button type="submit">Änderungen speichern (→ PENDING)</button>
+</form>
+<p style="margin-top:12px;">
+  <a href="/admin/emissions">Zurück zur Übersicht</a>
+  &nbsp;·&nbsp;
+  <a href="/admin/review">Zur Freigabe</a>
+</p>
+</body>
+</html>
